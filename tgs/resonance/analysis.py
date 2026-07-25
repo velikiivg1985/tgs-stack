@@ -48,7 +48,8 @@ def pattern_hashes(domain: Domain, size: int = 2) -> set[str]:
         for u, v, d in sg.edges(data=True):
             ru = sg.nodes[u].get("role") or sg.nodes[u].get("label", "?")
             rv = sg.nodes[v].get("role") or sg.nodes[v].get("label", "?")
-            triples.append(f"{ru}--{d.get('type', '?')}-->{rv}")
+            # Исправлено: 'relation' вместо 'type'
+            triples.append(f"{ru}--{d.get('relation', '?')}-->{rv}")
         triples.sort()
         h = hashlib.md5("|".join(triples).encode()).hexdigest()[:12]
         hashes.add(h)
