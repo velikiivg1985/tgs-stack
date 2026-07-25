@@ -1,5 +1,16 @@
-"""Uncertainty Tracker: estimates blind spots"""
-from dataclasses import dataclass
+"""Uncertainty Tracker: estimates blind spots and real uncertainty.
+
+Sources of uncertainty:
+1. Blind spots (from compression/retention)
+2. Contradictions (incompatible observations)
+3. Divergence (observers disagree)
+4. Forgotten patterns (patterns that no longer appear)
+5. Known unknowns (things we know we don't know)
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Protocol
 
 
 @dataclass
@@ -10,52 +21,30 @@ class BlindSpot:
     first_detected: int
 
 
-class UncertaintyTracker:
-    def __init__(self, retention_ratio: float = 0.4):
-        self.R = retention_ratio
-        self.blind_spots: list[BlindSpot] = []
-        self.rejected_patterns: list[str] = []
-        self.forgotten_patterns: list[str] = []
-        self.step = 0
-
-    def observe(self, all_patterns: list[str],
-                retained_patterns: list[str],
-                step: int) -> dict:
-        self.step = step
-        retained = set(retained_patterns)
-        all_p = set(all_patterns)
-        rejected = list(all_p - retained)
-        self.rejected_patterns.extend(rejected)
-        forgotten = [
-            p for p in self.rejected_patterns
-            if p not in all_p and p not in self.forgotten_patterns
-        ]
-        self.forgotten_patterns.extend(forgotten)
-        blind_ratio = 1.0 - self.R
-        self.blind_spots.append(BlindSpot(
-            description=f"Patterns lost to R={self.R:.2f} compression",
-            estimated_size=blind_ratio,
-            source="retention_ratio",
-            first_detected=step,
-        ))
+@dataclass
+class UncertaintyState:
+    """Structured view of current uncertainty."""
+    blind_spot_ratio: float = 0.0
+    contradiction_ratio: float = 0.0
+    divergence_ratio: float = 0.0
+    forgotten_ratio: float = 0.0
+    
+    # Counts
+    observed_count: int = 0
+    retained_count: int = 0
+    rejected_count: int = 0
+    forgotten_count: int = 0
+    
+    # Aggregate
+    total: float = 0.0
+    
+    def to_dict(self) -> dict:
         return {
-            "blind_ratio": blind_ratio,
-            "rejected_this_step": len(rejected),
-            "cumulative_rejected": len(self.rejected_patterns),
-            "cumulative_forgotten": len(self.forgotten_patterns),
-            "total_blind_spots": len(self.blind_spots),
-        }
-
-    def estimate_uncertainty(self) -> float:
-        if not self.blind_spots:
-            return 0.0
-        return sum(b.estimated_size for b in self.blind_spots) / len(self.blind_spots)
-
-    def get_state(self) -> dict:
-        return {
-            "retention_ratio": self.R,
-            "uncertainty": self.estimate_uncertainty(),
-            "rejected_count": len(self.rejected_patterns),
-            "forgotten_count": len(self.forgotten_patterns),
-            "blind_spots": len(self.blind_spots),
-        }
+            "blind_spot_ratio": self.blind_spot_ratio,
+            "contradiction_ratio": self.contradiction_ratio,
+            "divergence_ratio": self.divergence_ratio,
+            "forgotten_ratio": self.forgotten_ratio,
+            "observed_count": self.observed_count,
+            "retained_count": self.retained_count,
+            "rejected_count": self.rejected_count,
+            "forgotten_count": self.forgotten
