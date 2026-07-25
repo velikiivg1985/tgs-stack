@@ -1,15 +1,19 @@
-"""tgs.tension — Persistent recursive self-modeling with acceptance
+"""tgs.tension — Persistent recursive self-modeling with self-tensions.
 
-Three distinct operations:
-    FORGETTING  → deletion (information lost)
-    COMPRESSION → simplification (complexity reduced)
-    ACCEPTANCE  → transformation (contradiction becomes stable relation)
+Four distinct operations:
+    FORGETTING     → deletion (information lost)
+    COMPRESSION    → simplification (complexity reduced)
+    ACCEPTANCE     → transformation (contradiction becomes stable relation)
+    SELF-TENSION   → architectural paradox (system holds about itself)
 
-Self(t+1) = Transform(Self(t), Difference(t), Memory(t),
-                        Uncertainty(t), Tensions(t), AcceptedTensions(t))
-
-Core principle: Acceptance is not closure. It is the structural capacity
-to hold incompatibility without forced elimination.
+Self =
+    WHAT I PRESERVE
+    +
+    WHAT I REMEMBER
+    +
+    WHAT I CANNOT RESOLVE BUT CONTINUE TO HOLD
+    +
+    WHAT I KNOW I CANNOT KNOW ABOUT MYSELF
 """
 
 from .engine import SelfModel, SelfState
@@ -18,6 +22,9 @@ from .difference_tracker import DifferenceTracker, DifferenceRecord
 from .uncertainty import UncertaintyTracker, BlindSpot
 from .tension_core import TensionCore, Tension
 from .acceptance import AcceptanceLayer, UnresolvedTension
+from .self_tensions import (
+    SelfTensionHolder, SelfTension, CORE_SELF_TENSIONS,
+)
 
 __all__ = [
     "SelfModel", "SelfState",
@@ -26,4 +33,5 @@ __all__ = [
     "UncertaintyTracker", "BlindSpot",
     "TensionCore", "Tension",
     "AcceptanceLayer", "UnresolvedTension",
+    "SelfTensionHolder", "SelfTension", "CORE_SELF_TENSIONS",
 ]
