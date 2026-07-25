@@ -51,6 +51,7 @@ class UncertaintyState:
             "rejected_count": self.rejected_count,
             "forgotten_count": self.forgotten_count,
             "total": self.total,
+            "uncertainty": self.total,  # alias for backward compatibility
             "known_unknowns": self.known_unknowns,
         }
 
