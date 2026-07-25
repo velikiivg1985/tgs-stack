@@ -922,6 +922,8 @@ WHAT HAS NOT YET BEEN RESOLVED
 
 The repository includes several experiments.
 
+
+
 ## Resonance Demo
 
 Explores structural recognition and invariant extraction.
@@ -1020,7 +1022,44 @@ Run the tests:
 ```bash
 pytest
 ```
+## 🔧 Recent Improvements (v0.2.0)
 
+This release addresses critical architectural issues identified in code review:
+
+### Fixed Issues
+
+1. **Deterministic ID Generation**
+   - Replaced Python `hash()` with SHA-256 in `AcceptanceLayer`
+   - IDs are now reproducible across runs and platforms
+
+2. **Real Uncertainty Measurement**
+   - `UncertaintyLayer` now measures actual uncertainty from:
+     - Contradictions in observations
+     - Divergence between observers
+     - Blind spots from retention mechanisms
+   - No longer just `1 - retention_capacity`
+
+3. **Structural Invariants**
+   - `InvariantTracker` now identifies structurally similar patterns
+   - Uses Jaccard similarity and word overlap metrics
+   - Tracks transformations, not just repetitions
+
+4. **Comprehensive Test Suite**
+   - Added 40+ tests for core components
+   - Tests verify both code correctness and theoretical invariants
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/velikiivg1985/tgs-stack.git
+cd tgs-stack
+
+# Install in development mode
+pip install -e .
+
+# Run tests
+pytest tests/ -v
 ---
 
 # Research Questions
