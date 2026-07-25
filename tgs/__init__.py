@@ -1,43 +1,21 @@
-"""TGS-Stack: Geometric Self-Unfolding as a Computational Framework.
-
-Two complementary modules:
-
-    tgs.resonance — Cross-domain structural invariant discovery
-    tgs.tension   — Persistent recursive self-modeling with self-tensions
-"""
-
+"""TGS-Stack: Geometric Self-Unfolding as a Computational Framework."""
 from .resonance import (
     Domain, Node, Edge, Evidence,
     Observer, Observation,
-    ResonanceKernel, ResonanceAnalysis,
-    MutualObservationProtocol,
-    analyze as resonance_analyze,
+    ResonanceAnalysis, analyze, pattern_hashes,
+    Difference, DifferencePreservingObserver, MetaState,
+    TensionClassifier, classify_locally,
 )
-from .tension import (
-    SelfModel, SelfState,
-    InvariantTracker, InvariantRecord,
-    DifferenceTracker, DifferenceRecord,
-    UncertaintyTracker, BlindSpot,
-    TensionCore, Tension,
-    AcceptanceLayer, UnresolvedTension,
-    SelfTensionHolder, SelfTension, CORE_SELF_TENSIONS,
-)
+
+# Import tension module components here when ready
+# from .tension import SelfModel, TensionCore, AcceptanceLayer 
 
 __version__ = "1.1.0"
-
 __all__ = [
     # Resonance
     "Domain", "Node", "Edge", "Evidence",
     "Observer", "Observation",
-    "ResonanceKernel", "ResonanceAnalysis",
-    "MutualObservationProtocol",
-    "resonance_analyze",
-    # Tension
-    "SelfModel", "SelfState",
-    "InvariantTracker", "InvariantRecord",
-    "DifferenceTracker", "DifferenceRecord",
-    "UncertaintyTracker", "BlindSpot",
-    "TensionCore", "Tension",
-    "AcceptanceLayer", "UnresolvedTension",
-    "SelfTensionHolder", "SelfTension", "CORE_SELF_TENSIONS",
+    "ResonanceAnalysis", "analyze", "pattern_hashes",
+    "Difference", "DifferencePreservingObserver", "MetaState",
+    "TensionClassifier", "classify_locally",
 ]
