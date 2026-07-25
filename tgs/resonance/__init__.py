@@ -2,20 +2,22 @@
 from .domain import Domain, Node, Edge, Evidence
 from .observer import Observer, Observation
 from .analysis import ResonanceAnalysis, analyze, pattern_hashes
-from .difference import Difference, DifferencePreservingObserver, MetaState
-from .classifier import (
-    TensionClassifier, TGS_CLASSIFY_PROMPT,
-    parse_classification, classify_locally, format_classification,
-)
-
-# Note: If you have other modules like kernel.py, mutual.py, phase.py, 
-# reflexive.py, invariant.py — import them here when they are ready.
+from .invariant import Difference, DifferencePreservingObserver, MetaState, detect_tensions, Tension
+from .classifier import TensionClassifier, classify_locally
+from .kernel import ResonanceKernel
+from .mutual import MutualObservationProtocol
+from .reflexive import ReflexiveReport, observe_observation
+from .phase import run_phase_experiment, SelectiveObserver, RunMetrics
 
 __all__ = [
     "Domain", "Node", "Edge", "Evidence",
     "Observer", "Observation",
     "ResonanceAnalysis", "analyze", "pattern_hashes",
     "Difference", "DifferencePreservingObserver", "MetaState",
-    "TensionClassifier", "TGS_CLASSIFY_PROMPT",
-    "parse_classification", "classify_locally", "format_classification",
+    "detect_tensions", "Tension",
+    "TensionClassifier", "classify_locally",
+    "ResonanceKernel",
+    "MutualObservationProtocol",
+    "ReflexiveReport", "observe_observation",
+    "run_phase_experiment", "SelectiveObserver", "RunMetrics",
 ]
