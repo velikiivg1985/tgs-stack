@@ -15,7 +15,7 @@ class Node:
 class Edge:
     source: str
     target: str
-    type: str = "related_to"
+    relation: str = "related_to"   # было 'type'
     weight: float = 1.0
 
 @dataclass
@@ -38,5 +38,17 @@ class Domain:
         for n in self.nodes:
             G.add_node(n.id, label=n.label, role=n.role, **n.attributes)
         for e in self.edges:
-            G.add_edge(e.source, e.target, type=e.type, weight=e.weight)
+            G.add_edge(e.source, e.target, relation=e.relation, weight=e.weight)
         return G
+
+    def add_node(self, node: Node) -> None:
+        self.nodes.append(node)
+
+    def add_edge(self, edge: Edge) -> None:
+        self.edges.append(edge)
+
+    def node_by_id(self, node_id: str) -> Optional[Node]:
+        for n in self.nodes:
+            if n.id == node_id:
+                return n
+        return None
