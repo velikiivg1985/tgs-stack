@@ -1,1 +1,41 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
 
+[project]
+name = "tgs-stack"
+version = "1.0.0"
+description = "TGS-Stack: Geometric Self-Unfolding as a Computational Framework for Reflexive Systems"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "TGS Project" }]
+keywords = [
+    "structural-invariants", "graph-analysis", "observer-relative",
+    "self-reference", "phase-transition", "tension-driven-adaptation",
+    "recursive-self-model", "cognitive-architecture", "acceptance-layer",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+requires-python = ">=3.10"
+dependencies = ["networkx>=3.0"]
+
+[project.optional-dependencies]
+llm = ["openai>=1.0", "anthropic>=0.30"]
+dev = ["pytest>=7", "pytest-cov"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tgs", "tgs.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
