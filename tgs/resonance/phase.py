@@ -204,5 +204,154 @@ def make_rich_domain() -> Domain:
     return d
 
 
+def _classify_regime(trajectory: list[int], total_compressed: int, R: float) -> str:
+    """
+    Classify the run into COLLAPSE / STABLE / EXPLOSION.
+
+    Heuristics:
+    - COLLAPSE: node count drops to near-zero or stays trivially small
+    - EXPLOSION: node count grows unboundedly (no compression)
+    - STABLE: node count stays in a bounded range with memory accumulation
+    """
+    if not trajectory:
+        return "collapse"
+
+    final = trajectory[-1]
+    peak = max(trajectory)
+
+    # Collapse: final graph is trivially small
+    if final <= 2:
+        return "collapse"
+
+    # Explosion: graph grew large and nothing was compressed
+    if peak > 50 and total_compressed == 0:
+        return "explosion"
+
+    # Explosion: high R and growing trajectory
+    if R > 0.8 and len(trajectory) >= 3:
+        if trajectory[-1] > trajectory[0] * 2:
+            return "explosion"
+
+    # Collapse: low R and shrinking trajectory
+    if R < 0.2 and len(trajectory) >= 3:
+        if trajectory[-1] < trajectory[0] * 0.5:
+            return "collapse"
+
+    # Stable: bounded growth with active compression
+    if total_compressed > 0 and 2 < final <= peak:
+        return "stable"
+
+    # Default heuristic based on R
+    if 0.3 <= R <= 0.6:
+        return "stable"
+    if R < 0.3:
+        return "collapse"
+    return "explosion"
+
+
 def run_one(R: float, max_iter: int = 6, factory=make_cycle_domain) -> RunMetrics:
-    """Run
+    """Run a single phase-transition experiment.
+
+    Creates a domain via factory, then iteratively applies SelectiveObserver
+    with retention ratio R. Tracks node count trajectory and classifies
+    the resulting regime.
+
+    Args:
+        R: retention ratio (0.0 = forget everything, 1.0 = keep everything)
+        max_iter: number of observation iterations
+        factory: callable that returns a fresh Domain
+
+    Returns:
+        RunMetrics with trajectory, final counts, and regime classification
+    """
+    domain = factory()
+    observer = SelectiveObserver(retention_ratio=R, compress=True)
+    trajectory: list[int] = []
+    max_nodes = len(domain.nodes)
+
+    for i in range(max_iter):
+        result = observer.observe(domain, iteration=i)
+        domain = result["domain"]
+
+        node_count = len(domain.nodes)
+        trajectory.append(node_count)
+
+        if node_count > max_nodes:
+            max_nodes = node_count
+
+    total_compressed = sum(m.count for m in observer.memories.values())
+    regime = _classify_regime(trajectory, total_compressed, R)
+
+    return RunMetrics(
+        retention_ratio=R,
+        iterations_completed=max_iter,
+        final_nodes=len(domain.nodes),
+        final_edges=len(domain.edges),
+        max_nodes=max_nodes,
+        total_compressed=total_compressed,
+        regime=regime,
+        trajectory=trajectory,
+    )
+
+
+def run_phase_experiment(
+    ratios: list[float] | None = None,
+    max_iter: int = 6,
+    factory=make_cycle_domain,
+) -> dict:
+    """Run phase-transition experiment across a range of retention ratios.
+
+    Sweeps R from aggressive compression to full retention and identifies
+    the stable zone where self-reference is sustainable.
+
+    Args:
+        ratios: list of R values to test (default: 0.1 to 0.9)
+        max_iter: iterations per run
+        factory: domain factory
+
+    Returns:
+        dict with per-R results and identified stable zone
+    """
+    if ratios is None:
+        ratios = [round(r * 0.1, 1) for r in range(1, 10)]
+
+    results: list[RunMetrics] = []
+    for r in ratios:
+        metrics = run_one(R=r, max_iter=max_iter, factory=factory)
+        results.append(metrics)
+
+    # Identify stable zone
+    stable_ratios = [m.retention_ratio for m in results if m.regime == "stable"]
+    if stable_ratios:
+        stable_zone = (min(stable_ratios), max(stable_ratios))
+    else:
+        stable_zone = (0.0, 0.0)
+
+    return {
+        "results": results,
+        "stable_zone": stable_zone,
+        "summary": {
+            r.regime: sum(1 for m in results if m.regime == r.regime)
+            for r in results
+        },
+    }
+
+
+if __name__ == "__main__":
+    print("Phase Transition Experiment")
+    print("=" * 60)
+
+    exp = run_phase_experiment()
+    print(f"\nStable zone: R ∈ {exp['stable_zone']}")
+    print(f"Regime counts: {exp['summary']}")
+    print()
+
+    print(f"{'R':>5} | {'Regime':>10} | {'Final':>6} | {'Peak':>6} | {'Compressed':>10} | Trajectory")
+    print("-" * 60)
+    for m in exp["results"]:
+        traj_str = " → ".join(str(n) for n in m.trajectory)
+        print(
+            f"{m.retention_ratio:5.1f} | {m.regime:>10} | "
+            f"{m.final_nodes:6d} | {m.max_nodes:6d} | "
+            f"{m.total_compressed:10d} | {traj_str}"
+        )
