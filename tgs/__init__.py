@@ -1,14 +1,9 @@
-"""TGS-Stack: Geometric Self-Unfolding as a Computational Framework for Reflexive Systems
+"""TGS-Stack: Geometric Self-Unfolding as a Computational Framework.
 
 Two complementary modules:
 
     tgs.resonance — Cross-domain structural invariant discovery
-                    (what persists across different observers)
-
-    tgs.tension   — Persistent recursive self-modeling with acceptance
-                    (what persists through time via unresolved contradictions)
-
-Together they form the architectural conditions for functional self-reference.
+    tgs.tension   — Persistent recursive self-modeling with self-tensions
 """
 
 from .resonance import (
@@ -25,9 +20,10 @@ from .tension import (
     UncertaintyTracker, BlindSpot,
     TensionCore, Tension,
     AcceptanceLayer, UnresolvedTension,
+    SelfTensionHolder, SelfTension, CORE_SELF_TENSIONS,
 )
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     # Resonance
@@ -43,4 +39,5 @@ __all__ = [
     "UncertaintyTracker", "BlindSpot",
     "TensionCore", "Tension",
     "AcceptanceLayer", "UnresolvedTension",
+    "SelfTensionHolder", "SelfTension", "CORE_SELF_TENSIONS",
 ]
